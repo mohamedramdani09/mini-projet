@@ -49,38 +49,21 @@ class AuthController extends Controller
     {
         $request->validate([
             'username' => 'required|string',
-            'password' => 'required|string'
+            'password' => 'required|string',
         ]);
-    
-        $admin = Admin::where('username_admin', $request->username)->first();
-        
-        if($admin )
-        {
-            if($request->password == $admin->password_user)
-            {
-                return response()->json([
-                    'message' => 'Login successful',
-                    'input'=> $request->password,
-                    // 'password'=> $admin
-                ]);
-            }
-            else{
-                return response()->json([
-                    'error' => 'The provided credentials are incorrect.',
-                    'admin' => $admin,
-                    'input' => $request->password,
-            
-            ], 401);
-            }
-        }
-        else{
-            return response()->json([
-                'error' => 'The provided credentials are incorrect.',
-        
-        ], 401);
-        }   
 
-        
+        $admin = Admin::where('username_admin', $request->username)->first();
+
+        if (!$admin || $request->password == $admin->password_admin) {
+            return response()->json(['error' => 'The provided credentials are incorrect.'], 401);
+        }
+
+        $token = $admin->createToken('AdminAuthToken')->plainTextToken;
+
+        return response()->json([
+            'admin' => $admin,
+            'token' => $token,
+        ]);
     }
 
     public function logoutAdmin(Request $request)

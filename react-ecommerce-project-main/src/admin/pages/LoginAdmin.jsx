@@ -1,38 +1,38 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AuthContext } from "./../../contexts/AuthProvider";
+import React, { useEffect, useRef, useContext } from "react";
+import { AuthContext } from "../../contexts/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const title = "Login Admin to Dashboard";
 const btnText = "Login Now";
 
 const LoginAdmin = () => {
-    const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const { user, handleLoginAdmin } = useContext(AuthContext);
 
-    const handleSuccess = () => {
-        window.location.href = "/admin";
-      };
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        console.log(credentials);
-        await handleLoginAdmin(credentials, handleSuccess);
-        // Redirect or perform any other action after successful login
-      } catch (error) {
-        console.error('Login error:', error);
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+      const token = localStorage.getItem("ADMIN_TOKEN");
+      if (token) {
+        navigate("admin/");
       }
+    }, [navigate]);
+  
+    const usernameRef = useRef();
+    const passwordRef = useRef();
+  
+    const { handleLoginAdmin, loading } = useContext(AuthContext);
+  
+    const handleSuccess = () => {
+      window.location.href = "/admin/";
     };
   
-    const handleChange = (e) => {
-      setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    const Submit = (e) => {
+      e.preventDefault();
+      const payload = {
+          username: usernameRef.current.value,
+          password: passwordRef.current.value,
+      }
+      handleLoginAdmin(payload, handleSuccess);
     };
-
-    useEffect(() => {
-        const adminToken = localStorage.getItem('token');
-        if (adminToken) {
-            window.location.href = "/admin";
-        }
-    }, []);
 
   return (
     <div>
@@ -40,15 +40,14 @@ const LoginAdmin = () => {
         <div className="container">
           <div className="account-wrapper">
             <h3 className="title"> {title} </h3>
-            <form className="account-form" onSubmit={handleSubmit}>
+            <form className="account-form" onSubmit={Submit}>
               <div className="form-group">
                 <input
                   type="text"
                   name="username"
                   id="username"
-                  value={credentials.username}
-                  onChange={handleChange}
-                  placeholder="Email Address *"
+                  ref={usernameRef}
+                  placeholder="Username *"
                   required
                 />
               </div>
@@ -57,8 +56,7 @@ const LoginAdmin = () => {
                   type="password"
                   name="password"
                   id="password"
-                  value={credentials.password}
-                  onChange={handleChange}
+                  ref={passwordRef}
                   placeholder="Password *"
                   required
                 />
@@ -68,6 +66,7 @@ const LoginAdmin = () => {
                 <button
                   type="submit"
                   className="d-block lab-btn"
+                  disabled={loading}
                 >
                   <span> {btnText} </span>
                 </button>

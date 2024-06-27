@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
 import logo from "../assets/images/logo/logo.png";
 import { AuthContext } from "../contexts/AuthProvider";
 
@@ -9,7 +9,7 @@ const NavItems = () => {
   const [headerFixed, setHeaderFixed] = useState(false);
   const { user, loading } = useContext(AuthContext);
   const { handleLogout } = useContext(AuthContext);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,18 +24,20 @@ const NavItems = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+    
   }, []);
 
   if (loading) {
-    // Optionally, render a loading state while checking auth status
     return <div>Loading...</div>;
   }
 
-  const onLogout =  (ev) =>{
+  const redirect = () => navigate('/login');
+
+  const onLogout = (ev) => {
     ev.preventDefault();
-    handleLogout();
-   
-}
+    handleLogout(redirect);
+};
+
 
   return (
     <header className={`header-section style-4 ${headerFixed ? "header-fixed fadeInUp" : ""}`}>
@@ -50,7 +52,10 @@ const NavItems = () => {
               </>
             ) : (
               <>
-                <Link to="/account" className='lab-btn me-3 d-none d-md-block'> <span> My Account </span> </Link>
+              <li>
+                    <Link to="/cart-page"> Cart </Link>
+              </li>
+                {/* <Link to="/account" className='lab-btn me-3 d-none d-md-block'> <span> My Account </span> </Link> */}
                 <Link to="#" onClick={onLogout} className='lab-btn me-3 d-none d-md-block'> Logout </Link>
               </>
             )}
@@ -79,10 +84,9 @@ const NavItems = () => {
                   <li> <Link to="/shop"> Shop </Link> </li>
                   <li> <Link to="/blog"> Blog </Link> </li>
                   <li> <Link to="/about"> About </Link> </li>
-                  <li> <Link to="/cart-page"> Cart </Link> </li>
                   <li> <Link to="/contact"> Contact </Link> </li>
                   {!user ? (
-                <>
+                  <>
                   <li>
                     <Link to="/sign-up" className='lab-btn me-3 d-none d-md-block'> Create Account </Link>
                   </li>
@@ -93,8 +97,11 @@ const NavItems = () => {
               ) : (
                 <>
                 <li>
+                    <Link to="/cart-page"> Cart </Link>
+                  </li>
+                {/* <li>
                   <Link to="/account" className='lab-btn me-3 '> <span> My Account </span> </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="#" onClick={onLogout} className='lab-btn me-3'> Logout </Link>
                 </li>

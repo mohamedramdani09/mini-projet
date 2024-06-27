@@ -6,12 +6,13 @@ export const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
 
   const [user, setUser] = useState(null);
+  const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('ACCESS_TOKEN');
     if (token) {
-      setUser({ token });
+      setAdmin({ token });
     }
     setLoading(false);
   }, []);
@@ -47,12 +48,13 @@ const AuthProvider = ({ children }) => {
   };
 
  
-  const handleLogout = async () => {
+  const handleLogout = async (redirect) => {
     setLoading(true);
     try {
       await apiLogout();
       setUser(null); 
       localStorage.removeItem('ACCESS_TOKEN');
+      redirect();
       setLoading(false);
     } catch (error) {
       console.error("Logout error:", error);
@@ -65,8 +67,8 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const adminData = await apiLoginAdmin(credentials);
-      setUser(adminData);
-      localStorage.setItem('token', adminData.token);
+      setAdmin(adminData);
+      localStorage.setItem('ADMIN_TOKEN', adminData.token);
       setLoading(false);
       onSuccess();
     } catch (error) {
@@ -91,7 +93,7 @@ const AuthProvider = ({ children }) => {
   // };
 
   return (
-    <AuthContext.Provider value={{ user, loading, handleLogin, handleRegister, handleLogout, handleLoginAdmin}}>
+    <AuthContext.Provider value={{ user, admin, loading, handleLogin, handleRegister, handleLogout, handleLoginAdmin}}>
       {children}
     </AuthContext.Provider>
   );

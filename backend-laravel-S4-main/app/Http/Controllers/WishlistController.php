@@ -24,7 +24,6 @@ class WishlistController extends Controller
             'product_id' => 'required|exists:products,id_product',
         ]);
 
-        // تحقق مما إذا كان المنتج موجودًا بالفعل في قائمة الأمنيات للمستخدم
         $existingWishlistItem = Wishlist::where('user_id', $request->user_id)
             ->where('product_id', $request->product_id)
             ->first();

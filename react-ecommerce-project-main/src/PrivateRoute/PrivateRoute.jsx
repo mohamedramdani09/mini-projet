@@ -7,7 +7,7 @@ const PrivateRoute = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    // Check if token exists in localStorage
+    
     const token = localStorage.getItem('ACCESS_TOKEN');
     if (token) {
       setAuthenticated(true);

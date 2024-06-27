@@ -7,10 +7,10 @@ const PrivateRouteAdmin = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    // Check if token exists in localStorage
+  
     const token = localStorage.getItem('token');
     if (token) {
-      // You might want to add additional logic here to verify the token
+      
       setAuthenticated(true);
     }
     setLoading(false);

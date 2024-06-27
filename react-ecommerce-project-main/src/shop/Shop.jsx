@@ -23,12 +23,10 @@ const Shop = () => {
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    // Function to change current page - functions pour changer la page actuelle
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber)
     }
 
-    // Filter products based on category - Filtrer les produits selon la catégorie
     const [selectedCategory, setSelectedCategory] = useState("All");
     const menuItems = [...new Set(Data.map((Val) => Val.category ))];
 
@@ -44,13 +42,13 @@ const Shop = () => {
   return (
     <div>
         <PageHeader title="Our Shop Page" curPage="Shop" />
-        {/* Shop Page */}
+
         <div className='shop-page padding-tb'>
             <div className="container">
                 <div className="row justify-content-center">
                     <div className='col-lg-8 col-12'>
                         <article>
-                            {/* Title & Layout here */}
+
                             <div className='shop-title d-flex flex-warp justify-content-between'>
                                 <p> {showResults} </p>
                                 <div className={`product-view-mode ${GridList ? "gridActive" : "listActive"}`}>
@@ -63,7 +61,6 @@ const Shop = () => {
                                 </div>
                             </div>
 
-                            {/* Product Cards */}
                             <div>
                                 <ProductCards GridList={GridList} products={currentProducts} />
                             </div>

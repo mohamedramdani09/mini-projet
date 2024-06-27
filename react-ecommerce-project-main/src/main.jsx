@@ -115,7 +115,6 @@ const router = createBrowserRouter([
       { path: "categories", element: <Categories /> },
       { path: "orders", element: <Orders /> },
       // { path: 'logout', element: <PrivateRouteAdmin> <LogoutAdmin/> </PrivateRouteAdmin>},
-      // Add more admin routes here as needed
     ],
   },
 

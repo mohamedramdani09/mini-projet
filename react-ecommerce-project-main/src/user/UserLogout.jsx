@@ -11,7 +11,6 @@ const UserLogout = () => {
     const logout = async () => {
       try {
         await axiosInstance.post('/logout');
-        // Optionally clear user state or local storage here
         navigate('/');
       } catch (error) {
         console.error("Error during logout:", error);
@@ -22,6 +21,6 @@ const UserLogout = () => {
   }, [navigate]);
 
   return null;
-};// No need to render anything
+};
 
 export default UserLogout;

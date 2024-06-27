@@ -4,14 +4,10 @@ import { Link } from 'react-router-dom';
 import delImgUrl from '../assets/images/shop/del.png';
 
 const UserOrders = () => {
-  // State pour stocker les commandes de l'utilisateur
+  
   const [orders, setOrders] = useState([]);
 
-  // Fonction pour supprimer une commande
   const handleRemoveOrder = (orderId) => {
-    // Logique pour supprimer la commande avec l'ID donné
-    // Mise à jour de l'état des commandes
-    // updateOrders(updatedOrders);
   };
 
   return (
@@ -21,15 +17,12 @@ const UserOrders = () => {
       <div className="user-orders padding-tb">
         <div className="container">
           <div className="section-wrapper">
-            {/* Liste des commandes de l'utilisateur */}
             <div className="order-list">
               {orders.length > 0 ? (
                 orders.map((order, index) => (
                   <div key={index} className="order-item">
-                    {/* Détails de la commande */}
                     <div className="order-details">
                       <h4> Order ID S: {order.id}</h4>
-                      {/* Affichage des produits commandés */}
                       <ul className="ordered-products">
                         {order.products.map((product, indx) => (
                           <li key={indx}>
@@ -39,7 +32,6 @@ const UserOrders = () => {
                         ))}
                       </ul>
                     </div>
-                    {/* Bouton pour supprimer la commande */}
                     <button className="btn btn-danger" onClick={() => handleRemoveOrder(order.id)}>
                       Delete
                     </button>

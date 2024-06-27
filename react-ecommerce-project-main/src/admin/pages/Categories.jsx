@@ -1,10 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { getCategories, deleteCategory, createCategory, updateCategory } from './../apiFunction/apiService';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 
 function Categories() {
   const [categories, setCategories] = useState([]);
-  const [newCategory, setNewCategory] = useState({ name: "", description: "", img: null });
-  const [editCategory, setEditCategory] = useState({ id_category: null, name_category: "", description_category: "", img_category: null });
+  const [newCategory, setNewCategory] = useState({
+    name: "",
+    description: "",
+    img: null,
+  });
+  const imgRef = useRef();
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [formData, setFormData] = useState({
+    name_category: "",
+    description_category: "",
+    img_category: null,
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -12,56 +23,111 @@ function Categories() {
 
   const fetchCategories = async () => {
     try {
-      const categoriesData = await getCategories();
-      setCategories(categoriesData);
+      const response = await axios.get("http://127.0.0.1:8000/api/categories/");
+      setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
-  const handleDeleteCategory = async (categoryId) => {
+  const handleAddCategory = async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", newCategory.name);
+    formData.append("description", newCategory.description);
+    formData.append("img", imgRef.current.files[0]);
+
+    setLoading(true);
+
     try {
-      await deleteCategory(categoryId);
-      fetchCategories();
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/categories/create",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Category added:", response.data.category);
+      setCategories([...categories, response.data.category]);
+      setLoading(false);
+      resetForm();
     } catch (error) {
-      console.error('Error deleting category:', error);
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+      } else if (error.request) {
+        console.error("Error request:", error.request);
+      } else {
+        console.error("Error message:", error.message);
+      }
+      setLoading(false);
     }
   };
 
-  const handleAddCategory = async (e) => {
-    e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append("name", newCategory.name_category);
-      formData.append("description", newCategory.description_category);
-      formData.append("img", newCategory.img_category);
+  const resetForm = () => {
+    setNewCategory({
+      name: "",
+      description: "",
+      img: null,
+    });
+    imgRef.current.value = "";
+  };
 
-      await createCategory(formData);
-      setNewCategory({ name_category: "", description_category: "", img_category: null });
-      fetchCategories();
-    } catch (error) {
-      console.error('Error adding category:', error);
-    }
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setNewCategory({
+      ...newCategory,
+      [name]: value,
+    });
+  };
+
+  const handleModifyCategory = (category) => {
+    setSelectedCategory(category);
+    setFormData({
+      name_category: category.name_category,
+      description_category: category.description_category,
+    });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleUpdateCategory = async (e) => {
     e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append("name_category", editCategory.name_category);
-      formData.append("description_category", editCategory.description_category);
-      formData.append("img_category", editCategory.img_category);
 
-      await updateCategory(editCategory.id_category, formData);
-      setEditCategory({ id_category: null, name_category: "", description_category: "", img_category: null });
-      fetchCategories();
+    const updatedCategory = {
+      name_category: formData.name_category,
+      description_category: formData.description_category,
+      img_category: formData.img_category,
+    };
+
+    try {
+      const url = `http://127.0.0.1:8000/api/categories/${selectedCategory.id_category}`;
+      const response = await axios.put(url, updatedCategory);
+      console.log("Category updated successfully:", response.data);
+      const updatedCategories = categories.map((category) =>
+        category.id_category === selectedCategory.id_category ? response.data.category : category
+      );
+      setCategories(updatedCategories);
     } catch (error) {
-      console.error('Error updating category:', error);
+      console.error("Error updating category:", error);
     }
   };
 
-  const handleEditClick = (category) => {
-    setEditCategory(category);
+  const handleDeleteCategory = async (id) => {
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/categories/${id}`);
+      console.log("Category deleted successfully");
+      setCategories(categories.filter((category) => category.id_category !== id));
+    } catch (error) {
+      console.error("Error deleting category:", error);
+    }
   };
 
   return (
@@ -72,7 +138,6 @@ function Categories() {
           className="btn btn-primary px-3 me-3 animated fadeInUp"
           data-bs-toggle="modal"
           data-bs-target="#addCategoryModal"
-
         >
           Add
         </button>
@@ -93,18 +158,10 @@ function Categories() {
             {categories.map((category, index) => (
               <tr key={category.id_category}>
                 <th scope="row">{index + 1}</th>
-                <td>{category.img_category}</td>
+                <td><img src={`/src/assets/images/shop/${category.img_category}`} style={{width: '100px'}}/></td>
                 <td>{category.name_category}</td>
                 <td>{category.description_category}</td>
                 <td>
-                  <button
-                    className="btn btn-success px-3 me-3 animated fadeInUp"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editCategoryModal"
-                    onClick={() => handleEditClick(category)}
-                  >
-                    Modify
-                  </button>
                   <button
                     className="btn btn-danger px-3 animated fadeInUp"
                     onClick={() => handleDeleteCategory(category.id_category)}
@@ -150,9 +207,9 @@ function Categories() {
                     type="text"
                     className="form-control text-black"
                     id="nameCategory"
-                    name="name_category"
-                    value={newCategory.name_category}
-                    onChange={(e) => setNewCategory({ ...newCategory, name_category: e.target.value })}
+                    name="name"
+                    value={newCategory.name}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div className="mb-3">
@@ -166,9 +223,9 @@ function Categories() {
                     type="text"
                     className="form-control text-black"
                     id="descriptionCategory"
-                    name="description_category"
-                    value={newCategory.description_category}
-                    onChange={(e) => setNewCategory({ ...newCategory, description_category: e.target.value })}
+                    name="description"
+                    value={newCategory.description}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div className="mb-3">
@@ -182,86 +239,13 @@ function Categories() {
                     className="form-control"
                     type="file"
                     id="imgCategory"
-                    name="img_category"
-                    onChange={(e) => setNewCategory({ ...newCategory, img_category: e.target.files[0] })}
+                    name="img"
+                    ref={imgRef}
+                    onChange={handleInputChange}
                   />
                 </div>
-                <button type="submit" className="btn btn-warning px-5 fw-bold">
-                  Add
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit Category Modal */}
-      <div
-        className="portfolio-modal modal fade bg"
-        id="editCategoryModal"
-        tabIndex="-1"
-        aria-labelledby="editCategoryModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-xl">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <button
-                className="btn-close"
-                type="button"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="mx-5">
-              <h1 className="text-warning mb-3">Modify Category</h1>
-              <form onSubmit={handleUpdateCategory} className="mb-5">
-                <div className="mb-3">
-                  <label
-                    htmlFor="editNameCategory"
-                    className="form-label fw-bold text-black"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control text-black"
-                    id="editNameCategory"
-                    value={editCategory.name_category}
-                    onChange={(e) => setEditCategory({ ...editCategory, name_category: e.target.value })}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label
-                    htmlFor="editDescriptionCategory"
-                    className="form-label fw-bold text-black"
-                  >
-                    Description
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control text-black"
-                    id="editDescriptionCategory"
-                    value={editCategory.description_category}
-                    onChange={(e) => setEditCategory({ ...editCategory, description_category: e.target.value })}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label
-                    htmlFor="editImgCategory"
-                    className="form-label fw-bold text-black"
-                  >
-                    Choose Image
-                  </label>
-                  <input
-                    className="form-control"
-                    type="file"
-                    id="editImgCategory"
-                    onChange={(e) => setEditCategory({ ...editCategory, img_category: e.target.files[0] })}
-                  />
-                </div>
-                <button type="submit" className="btn btn-warning px-5 fw-bold">
-                  Update
+                <button type="submit" className="btn btn-warning px-5 fw-bold" disabled={loading}>
+                  {loading ? "Adding..." : "Add"}
                 </button>
               </form>
             </div>

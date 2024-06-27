@@ -8,41 +8,34 @@ const UserCart = () => {
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    // Fetch Cart Item from Local Storage
+    
     const storedCartItems = JSON.parse(localStorage.getItem('cart')) || [];
     setCartItems(storedCartItems);
   }, []);
 
-  // Calculate Prices - Calcul des prix 
   const calculateTotalPrice = (item) => {
     return item.price * item.quantity;
   };
 
-  // Handle quantity increase - incrémnter la quantité des produits
   const handleIncrease = (item) => {
     item.quantity += 1;
     setCartItems([...cartItems]);
 
-    // Update Local Storage with New Cart Items - Mise à jour du panier
     localStorage.setItem('cart', JSON.stringify(cartItems));
   };
 
-  // Handle quantity decrease - fonction pour décrementer la quantité du produit
   const handleDecrease = (item) => {
     if (item.quantity > 1) {
       item.quantity -= 1;
       setCartItems([...cartItems]);
 
-      // Update Local Storage with New Cart Items - mise à jour
       localStorage.setItem('cart', JSON.stringify(cartItems));
     }
   };
 
-  // Handle Item Remove - fonction pour la suppression du panier
   const handleRemoveItem = (item) => {
     const updatedCart = cartItems.filter((cartItem) => cartItem.id !== item.id);
 
-    // Update New Cart - mise à jour du panier
     setCartItems(updatedCart);
     updateLocalStorage(updatedCart);
   };
@@ -51,12 +44,10 @@ const UserCart = () => {
     localStorage.setItem('cart', JSON.stringify(cart));
   };
 
-  // Cart Subtotal - Totale du panier
   const cartSubtotal = cartItems.reduce((total, item) => {
     return total + calculateTotalPrice(item);
   }, 0);
 
-  // Order Total
   const orderTotal = cartSubtotal;
 
   return (
@@ -79,7 +70,6 @@ const UserCart = () => {
                   </tr>
                 </thead>
 
-                {/* Table Body */}
                 <tbody>
                   {cartItems.map((item, indx) => (
                     <tr key={indx}>
@@ -117,9 +107,7 @@ const UserCart = () => {
               </table>
             </div>
 
-            {/* Cart Bottom */}
             <div className="cart-bottom">
-              {/* CheckOut Box */}
               <div className="cart-checkout-box">
                 <form className="coupon">
                   <input className="cart-page-input-text" type="text" name="coupon" id="coupon" placeholder="Coupon Code ..." />
@@ -134,13 +122,11 @@ const UserCart = () => {
                 </form>
               </div>
 
-              {/* Shopping Box */}
               <div className="shiping-box">
                 <div className="row">
                   <div className="col-md-6 col-12">
                     <div className="calculate-shiping">
                       <h3> Calculate Shipping </h3>
-                      {/* Shipping calculation form */}
                     </div>
                   </div>
 

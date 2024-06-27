@@ -17,34 +17,30 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // Validate incoming request data
+        
         $vqlidqte  = Validator::make($request->all(),[
             'name' => 'required|string|max:255|unique:products,name_product', 
             'description' => 'required|string',
-            'img' => 'required|mimes:png,jpg,jpeg|max:2048', // Adjust file size limit as needed
+            'img' => 'required|mimes:png,jpg,jpeg|max:2048',
             'price' => 'required|numeric',
             'brand' => 'required|string|max:255',
             'quantity' => 'required|integer',
             'category_id' => 'required|exists:categories,id_category',]);
-             // Ensure category exists
              if($vqlidqte->fails())
              {
                 return response()->json([
                     'errors'=> $vqlidqte->errors(),
                 ],200);
              }
-
-        // Handle image upload
         if ($request->hasFile('img')) {
             $image = $request->file('img');
-            $imageName = time().'.'.$image->getClientOriginalExtension();
+            $imageName = $image->getClientOriginalName();
             $image->move(resource_path('images'), $imageName);
-            $imgPath = '/images/'.$imageName;
+            $imgPath = ''.$imageName;
         } else {
             $imgPath = null;
         }
     
-        // Create new product instance
         $product = Product::create([
             'name_product' => $request->name,
             'description_product' => $request->description,
@@ -56,7 +52,6 @@ class ProductController extends Controller
             'category_id' => $request->category_id,
         ]);
 
-        // Return response
         return response()->json([
             'message' => 'Product created successfully!',
             'product' => $product,

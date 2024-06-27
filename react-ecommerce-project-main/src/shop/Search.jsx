@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Search = ({ products = [], GridList }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Vérifiez que products est bien un tableau et filtrez les produits valides
+  
   const filteredProducts = products.filter((product) => 
     product && product.name && product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -25,7 +25,6 @@ const Search = ({ products = [], GridList }) => {
         </button>
       </form>
 
-      {/* Afficher les résultats de la recherche */}
       <div>
         {
           searchTerm && filteredProducts.map((product) => (
