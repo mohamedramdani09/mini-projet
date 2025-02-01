@@ -17,7 +17,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/register', [UserController::class, 'store'])->name('auth.register');
 
 // Protected routes
-// Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     // User specific routes
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('users.index');
@@ -78,10 +78,14 @@ Route::post('/register', [UserController::class, 'store'])->name('auth.register'
     // General logout route 
         Route::post('/logout', [AuthController::class, 'logout']);
 
-    // });
+    });
     
     Route::get('/admin/create', [AuthController::class, 'createAdmin']);
     Route::post('/admin/login', [AuthController::class, 'loginAdmin']);
 
 
 Route::get('/statistics', [StatisticsController::class, 'index']);
+
+
+
+
